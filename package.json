@@ -1,0 +1,24 @@
+{
+  "name": "nowconfig",
+  "version": "1.0.0",
+  "description": "ServiceNow Config Tool",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "run": "app.js",
+    "test": "test.js"
+  },
+  "keywords": [
+    "ServiceNow",
+    "Config",
+    "Setup",
+    "API",
+    "Management"
+  ],
+  "author": "Halley",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "latest",
+    "node-fetch": "latest"
+  }
+}
