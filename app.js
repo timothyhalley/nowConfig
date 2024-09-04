@@ -1,29 +1,24 @@
 //
-//https://docs.servicenow.com/bundle/washingtondc-api-reference/page/build/applications/concept/api-rest.html
-
+// Module Function: Main calling app / entry point for project
 //
-//
-import fetch from 'node-fetch'; // ES module import
-import dotenv from 'dotenv'; // ES module import
-dotenv.config(); // Load environment variables from .env file
-import { getOAuthToken } from "./utl_Auth.js"
 
-async function getPDIProperties(pdiUrl, username, password) {
-    try {
-        const response = await fetch(`${pdiUrl}/api/now/v1/table/sys_properties`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
-            },
-        });
+// Supporting Libraries:
+import { callAPI, nowAPI2 } from "./utl_Fetch.js";
+import { getEndpointData } from "./utl_APIEndPoints.js";
+import { getPDIVersion } from './api_GetInfo.js';
 
-        if (!response.ok) {
-            throw new Error(`Error fetching version: ${response.status} ${response.statusText}`);
-        }
 
-        const responseBody = await response.text(); // Read the response body as text
-        const data = JSON.parse(responseBody); // Parse the text as JSON
+(async function () {
 
+
+    const Sys_Properties = 'api/now/v1/table/sys_properties'
+
+    const sys_prop_api = getEndpointData("sys_properties")
+
+    // call functions
+    const data = await callAPI(sys_prop_api.endpoint);
+    if (data) {
+        // Select VERSION from sys_props data
         let versionProperty = null;
         data.result.forEach(prop => {
             if (prop.name.includes('version')) {
@@ -34,72 +29,47 @@ async function getPDIProperties(pdiUrl, username, password) {
             }
 
         });
-
-        // const versionProperty = data.result.find(prop => prop.name === 'com.glide.embedded_help.version.value');
-        return versionProperty;
-    } catch (error) {
-        if (error.message.includes("Unexpected token")) {
-            console.log("WAKE YOUR INSTANCE FROM THE DEVELOPER PORTAL")
-            console.log("https://developer.servicenow.com")
-            console.log("Instance URL: ", pdiUrl)
-        } else {
-            console.error(`Error fetching version: ${error.message}`);
-        }
-        return null;
-    }
-}
-
-async function nowAPI(apiUrl, username, password) {
-    try {
-        const response = await fetch(`${apiUrl}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error calling API: ${response.status} ${response.statusText}`);
-        }
-
-        const responseBody = await response.text(); // Read the response body as text
-        const data = JSON.stringify(responseBody); // Parse the text as JSON
-
-        console.log(data)
-
-        return data
-
-    } catch (error) {
-        if (error.message.includes("Unexpected token")) {
-            console.log("WAKE YOUR INSTANCE FROM THE DEVELOPER PORTAL")
-        }
-        console.error(`Error fetching version: ${error.message}`);
-        return null;
-    }
-}
-
-
-(async function () {
-
-    // get environment vars from .env
-    const PDI_URL = process.env.PDI_URL
-    const PDI_UID = process.env.PDI_UID
-    const PDI_PWD = process.env.PDI_PWD
-
-    // call functions
-    const version = await getPDIProperties(PDI_URL, PDI_UID, PDI_PWD);
-    if (version) {
-        console.log(`PDI version: ${version}`);
+        console.log(`PDI version: ${versionProperty}`);
     } else {
         console.log('Unable to retrieve version.');
     }
 
-    const apiURL = PDI_URL + "/stats.do"
-    const stats = await nowAPI(apiURL, PDI_UID, PDI_PWD)
-    if (stats) {
-        console.log("here are the stats:\n", stats)
+    // const apiURL = PDI_URL + "/stats.do"
+    // const statsHTML = await nowAPI2(PDI_UID, PDI_PWD, apiURL)
+    // if (statsHTML) {
+    //     console.log("\n\nHere are the stats:\n", statsHTML)
+    // } else {
+    //     console.log('\n\nUnable to retrieve PID stats.');
+    // }
+
+    const apiCart = "api/sn_sc/servicecatalog/cart"
+    // console.log(apiCart)
+    const cartItems = await callAPI(apiCart)
+    if (cartItems) {
+        console.log("\n\nShow cart items:\n", cartItems)
     } else {
-        console.log('Unable to retrieve PID stats.');
+        console.log('\n\nUnable to retrieve cart.');
     }
 
+    const apiSysUsers = "api/now/table/sys_user"
+    // console.log(apiCart)
+    const apiUsers = await callAPI(apiSysUsers)
+    if (apiUsers) {
+        const result = apiUsers.result.map(user => ({
+            first_name: user.first_name,
+            middle_name: user.middle_name,
+            last_name: user.last_name,
+            email: user.email,
+            avatar: user.avatar
+        }));
+        console.log("\n\nShow Sys Users:\n", result)
+    } else {
+        console.log('\n\nUnable to get SysUsers.');
+    }
 })();
+
+
+// Help URL:
+//
+//https://docs.servicenow.com/bundle/xanadu-api-reference/page/build/applications/concept/api-rest.html
+//
