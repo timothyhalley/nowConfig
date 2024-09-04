@@ -5,17 +5,24 @@
 // Supporting Libraries:
 import { callAPI, nowAPI2 } from "./utl_Fetch.js";
 import { getEndpointData } from "./utl_APIEndPoints.js";
+import { setUpdateData } from "./utl_PDIUpdate.js";
 import { getPDIVersion } from './api_GetInfo.js';
 
 
 (async function () {
 
-
-    const Sys_Properties = 'api/now/v1/table/sys_properties'
-
+    // Get instance Info:
+    // -------------------------------------------------------------------
+    // Get PDI Name:
+    const apiGetName = getEndpointData("pdi_Name")
+    const pdiName = await callAPI(apiGetName.endpoint);
+    if (pdiName.result && pdiName.result.length > 0) {
+        console.log('Instance Name:', pdiName.result[0].value);
+    } else {
+        console.log('Unable to retrieve PDI Name.');
+    }
+    // Version --> 
     const sys_prop_api = getEndpointData("sys_properties")
-
-    // call functions
     const data = await callAPI(sys_prop_api.endpoint);
     if (data) {
         // Select VERSION from sys_props data
@@ -27,12 +34,13 @@ import { getPDIVersion } from './api_GetInfo.js';
                     versionProperty = prop.value
                 }
             }
-
         });
         console.log(`PDI version: ${versionProperty}`);
     } else {
         console.log('Unable to retrieve version.');
     }
+
+
 
     // const apiURL = PDI_URL + "/stats.do"
     // const statsHTML = await nowAPI2(PDI_UID, PDI_PWD, apiURL)
@@ -52,20 +60,24 @@ import { getPDIVersion } from './api_GetInfo.js';
     }
 
     const apiSysUsers = "api/now/table/sys_user"
-    // console.log(apiCart)
     const apiUsers = await callAPI(apiSysUsers)
     if (apiUsers) {
-        const result = apiUsers.result.map(user => ({
-            first_name: user.first_name,
-            middle_name: user.middle_name,
-            last_name: user.last_name,
-            email: user.email,
-            avatar: user.avatar
+
+        const result = apiUsers.result
+            .filter(user => user.user_name === 'admin')
+            .map(user => ({
+                user_name: user.user_name,
+                first_name: user.first_name,
+                middle_name: user.middle_name,
+                last_name: user.last_name,
+                email: user.email,
+                avatar: user.avatar
         }));
         console.log("\n\nShow Sys Users:\n", result)
     } else {
         console.log('\n\nUnable to get SysUsers.');
     }
+
 })();
 
 

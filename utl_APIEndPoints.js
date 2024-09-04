@@ -1,8 +1,16 @@
 const apiData = {
     "endpoints": {
         "sys_properties": {
-            "endpoint": "api/now/v1/table/sys_properties",
+            "endpoint": "api/now/table/sys_properties",
             "message": "Sys Properties API - Successful",
+            "error": {
+                "code": 1001,
+                "description": "Example error occurred"
+            }
+        },
+        "pdi_Name": {
+            "endpoint": "api/now/table/sys_properties?sysparm_query=name=instance_name",
+            "message": "Sys Properties API: PDI Name - Successful",
             "error": {
                 "code": 1001,
                 "description": "Example error occurred"
