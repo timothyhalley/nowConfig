@@ -31,6 +31,9 @@ const apiData = {
                 "code": 1002,
                 "description": "Another error occurred"
             }
+        },
+        "browser_tab_title": {
+            "endpoint": ""
         }
     }
 };

@@ -3,7 +3,7 @@
 //
 
 // Supporting Libraries:
-import { callAPI, nowAPI2 } from "./utl_Fetch.js";
+import { getAPI, putAPI } from "./utl_Fetch.js";
 import { getEndpointData } from "./utl_APIEndPoints.js";
 import { setUpdateData } from "./utl_PDIUpdate.js";
 import { getPDIVersion } from './api_GetInfo.js';
@@ -15,7 +15,7 @@ import { getPDIVersion } from './api_GetInfo.js';
     // -------------------------------------------------------------------
     // Get PDI Name:
     const apiGetName = getEndpointData("pdi_Name")
-    const pdiName = await callAPI(apiGetName.endpoint);
+    const pdiName = await getAPI(apiGetName.endpoint);
     if (pdiName.result && pdiName.result.length > 0) {
         console.log('Instance Name:', pdiName.result[0].value);
     } else {
@@ -23,7 +23,7 @@ import { getPDIVersion } from './api_GetInfo.js';
     }
     // Version --> 
     const sys_prop_api = getEndpointData("sys_properties")
-    const data = await callAPI(sys_prop_api.endpoint);
+    const data = await getAPI(sys_prop_api.endpoint);
     if (data) {
         // Select VERSION from sys_props data
         let versionProperty = null;
@@ -40,8 +40,6 @@ import { getPDIVersion } from './api_GetInfo.js';
         console.log('Unable to retrieve version.');
     }
 
-
-
     // const apiURL = PDI_URL + "/stats.do"
     // const statsHTML = await nowAPI2(PDI_UID, PDI_PWD, apiURL)
     // if (statsHTML) {
@@ -52,7 +50,7 @@ import { getPDIVersion } from './api_GetInfo.js';
 
     const apiCart = "api/sn_sc/servicecatalog/cart"
     // console.log(apiCart)
-    const cartItems = await callAPI(apiCart)
+    const cartItems = await getAPI(apiCart)
     if (cartItems) {
         console.log("\n\nShow cart items:\n", cartItems)
     } else {
@@ -60,7 +58,7 @@ import { getPDIVersion } from './api_GetInfo.js';
     }
 
     const apiSysUsers = "api/now/table/sys_user"
-    const apiUsers = await callAPI(apiSysUsers)
+    const apiUsers = await getAPI(apiSysUsers)
     if (apiUsers) {
 
         const result = apiUsers.result
@@ -72,7 +70,7 @@ import { getPDIVersion } from './api_GetInfo.js';
                 last_name: user.last_name,
                 email: user.email,
                 avatar: user.avatar
-        }));
+            }));
         console.log("\n\nShow Sys Users:\n", result)
     } else {
         console.log('\n\nUnable to get SysUsers.');

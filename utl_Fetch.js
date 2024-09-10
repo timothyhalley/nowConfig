@@ -6,7 +6,7 @@ const PDI_UID = process.env.PDI_UID
 const PDI_PWD = process.env.PDI_PWD
 
 
-export async function callAPI(apiURI) {
+export async function getAPI(apiURI) {
     try {
         const apiURL = PDI_URL + apiURI
         const response = await fetch(`${apiURL}`, {
@@ -38,14 +38,15 @@ export async function callAPI(apiURI) {
     }
 }
 
-export async function nowAPI2(apiURI) {
+export async function putAPI(apiURI) {
     try {
         const apiURL = PDI_URL + apiURI
         const response = await fetch(`${apiURL}`, {
-            method: 'GET',
+            method: 'PUT',
             headers: {
                 'Authorization': `Basic ${btoa(`${PDI_UID}:${PDI_PWD}`)}`,
                 'Accept': 'application/json',
+                'Content-Type': 'application/json'
             },
         });
 
